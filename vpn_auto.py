@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -107,6 +108,12 @@ def main() -> None:
     ui_path = get_env("CISCO_UI_PATH", required=False)
 
     otp = generate_otp(otp_secret)
+
+    if ui_path and os.name == 'nt':
+        ui_name = Path(ui_path.strip()).name
+        print(f"Chiudendo {ui_name} (se aperto) per evitare conflitti...")
+        subprocess.run(["taskkill", "/F", "/IM", ui_name], capture_output=True)
+        time.sleep(1)
 
     print("Connecting to ETH VPN... (this might take a few seconds)")
     result = call_cisco_cli(host, user, password, otp, cli_path, vpn_group)

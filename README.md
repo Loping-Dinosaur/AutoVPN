@@ -61,3 +61,7 @@ To run the script easily by double-clicking an icon on your desktop, you can cre
 
 4. Save the file.
 5. Now you can simply double-click `Connect_VPN.bat` on your desktop to automatically connect to the ETH VPN!
+
+## Notes
+
+- **Auto-Close UI:** If the Cisco Secure Client graphical interface is already open, the script will automatically close it before connecting to avoid conflicts. It will safely reopen the UI after the connection is established (if `CISCO_UI_PATH` is configured in your `.env` file).
