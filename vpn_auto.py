@@ -111,7 +111,7 @@ def main() -> None:
 
     if ui_path and os.name == 'nt':
         ui_name = Path(ui_path.strip()).name
-        print(f"Chiudendo {ui_name} (se aperto) per evitare conflitti...")
+        print(f"Closing {ui_name} (if open) to avoid conflicts...")
         subprocess.run(["taskkill", "/F", "/IM", ui_name], capture_output=True)
         time.sleep(1)
 
