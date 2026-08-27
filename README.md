@@ -47,20 +47,25 @@ While this script provides a convenient way to automate the VPN connection proce
    - *Note: Keep your `.env` file safe and NEVER upload it to GitHub.*
 
 ## Create a Desktop Shortcut (.bat file)
+## Running AutoVPN (Silent / Headless)
 
 To run the script easily by double-clicking an icon on your desktop, you can create a simple Batch file:
+You can launch AutoVPN in the background without opening a terminal window:
 
 1. Right-click on an empty space on your Desktop and select **New -> Text Document**.
 2. Rename the file to `Connect_VPN.bat` (make sure you delete the `.txt` extension).
-3. Right-click the new `.bat` file, select **Edit**, and paste the following code (adjust the paths if you cloned the repository to a folder other than `C:\AutoVPN`):
+3. Right-click the new `.bat` file, select **Edit**, and paste the following code (adjust the paths if you cloned the repository to a folder other than `C:\projects\AutoVPN`):
+- **From Windows Search / Start Menu**: Press `Win`, type `AutoVPN`, and press `Enter`.
+- **Using the VBScript launcher**: Double-click `run_autovpn.vbs` in the project root.
+- **From Desktop**: Create a shortcut to `run_autovpn.vbs` (or run it via `wscript.exe`).
 
    ```bat
    @echo off
-   C:\AutoVPN\.venv\Scripts\python.exe C:\AutoVPN\vpn_auto.py
+   start "" "C:\projects\AutoVPN\.venv\Scripts\pythonw.exe" "C:\projects\AutoVPN\vpn_auto.py"
    ```
 
 4. Save the file.
-5. Now you can simply double-click `Connect_VPN.bat` on your desktop to automatically connect to the ETH VPN!
+5. Now you can simply double-click `Connect_VPN.bat` or launch **AutoVPN** directly from the Windows Start menu!
 
 ## Notes
 

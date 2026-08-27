@@ -37,9 +37,20 @@ def load_config() -> None:
     load_dotenv(dotenv_path=CONFIG_PATH)
 
 
+def notify_error(message: str) -> None:
+    print(f"ERROR: {message}", file=sys.stderr)
+    if os.name == "nt":
+        try:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, str(message), "AutoVPN Error", 0x10 | 0x10000)
+        except Exception:
+            pass
+
+
 def get_env(var: str, required: bool = True) -> Optional[str]:
     val = os.getenv(var)
     if required and (val is None or val.strip() == ""):
+        notify_error(f"Environment variable {var} is not set or empty")
         sys.exit(f"Environment variable {var} is not set or empty")
     return val
 
@@ -67,6 +78,7 @@ def _resolve_cli_executable(cli_path: Optional[str]) -> str:
         if not path:
             return "vpncli.exe"
         if not Path(path).exists():
+            notify_error(f"Cisco CLI not found at {path}")
             sys.exit(f"Cisco CLI not found at {path}")
         return path
 
@@ -93,7 +105,11 @@ def call_cisco_cli(
     # 4. OTP (Second Password)
     input_cmds = f"{vpn_group}\n{user}\n{password}\n{otp}\n"
 
-    return subprocess.run(cmd, input=input_cmds, capture_output=True, text=True)
+    kwargs = {}
+    if os.name == "nt":
+        kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
+
+    return subprocess.run(cmd, input=input_cmds, capture_output=True, text=True, **kwargs)
 
 
 def main() -> None:
@@ -112,16 +128,20 @@ def main() -> None:
     if ui_path and os.name == 'nt':
         ui_name = Path(ui_path.strip()).name
         print(f"Closing {ui_name} (if open) to avoid conflicts...")
-        subprocess.run(["taskkill", "/F", "/IM", ui_name], capture_output=True)
+        subprocess.run(
+            ["taskkill", "/F", "/IM", ui_name],
+            capture_output=True,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        )
         time.sleep(1)
 
     print("Connecting to ETH VPN... (this might take a few seconds)")
     result = call_cisco_cli(host, user, password, otp, cli_path, vpn_group)
 
     if result.returncode != 0:
-        print(f"Cisco CLI returned non-zero exit status: {result.returncode}")
-        print("stdout:", result.stdout)
-        print("stderr:", result.stderr)
+        err_output = f"Cisco CLI returned non-zero exit status: {result.returncode}\n\nSTDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}"
+        print(err_output)
+        notify_error(err_output)
         sys.exit(result.returncode)
 
     print("Connection attempt complete. Output below:")

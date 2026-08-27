@@ -53,8 +53,8 @@ def test_call_cisco_cli_default(monkeypatch, tmp_path):
     monkeypatch.setattr(subprocess, "run", fake_run)
     res = vpn_auto.call_cisco_cli("host", "user", "pass", "otp", None)
     assert res.returncode == 0
-    # default vpn group should be student-net
-    assert "student-net" in captured['input']
+    # default vpn group should be 1
+    assert "1" in captured['input']
     assert captured['cmd'][0] == "vpncli.exe"
 
 
@@ -79,7 +79,7 @@ def test_call_cisco_cli_with_path(monkeypatch, tmp_path):
     res = vpn_auto.call_cisco_cli("h", "u", "p", "o", str(path))
     assert res.returncode == 0
     assert captured['cmd'][0] == str(path)
-    assert "student-net" in captured['input']
+    assert "1" in captured['input']
 
 
 def test_resolve_cli_executable_bad_path(monkeypatch, tmp_path):
