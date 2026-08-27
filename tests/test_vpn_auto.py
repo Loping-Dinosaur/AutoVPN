@@ -7,6 +7,11 @@ import pyotp
 import vpn_auto
 
 
+@pytest.fixture(autouse=True)
+def disable_messagebox(monkeypatch):
+    monkeypatch.setattr(vpn_auto, "notify_error", lambda msg: None)
+
+
 def test_generate_otp():
     # Use a known secret and verify output is 6 digits
     secret = pyotp.random_base32()
